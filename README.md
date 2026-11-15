@@ -206,9 +206,11 @@ which matches the known stubble-burning season.
 ## Risk engine and early warning
 
 $$
-z = \frac{x - \operatorname{median}_{\text{same month, past years}}}{1.4826 \cdot \operatorname{MAD}}
-\qquad
-\text{risk} = 0.4\,\tilde{z} + 0.3\,\tilde{d}_{\text{early}} + 0.3\,\tilde{e}_{\text{forecast}}
+z = \frac{x - \mathrm{median}_{\mathrm{same\ month,\ past\ years}}}{1.4826 \cdot \mathrm{MAD}}
+$$
+
+$$
+\mathrm{risk} = 0.4 \ \tilde{z} + 0.3 \ \tilde{d}_{\mathrm{early}} + 0.3 \ \tilde{e}_{\mathrm{forecast}}
 $$
 
 where the tilde marks values min–max normalised across cells, $d_{\text{early}}$ is how many days the season started
