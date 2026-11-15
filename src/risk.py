@@ -4,7 +4,7 @@ OUT = "data/processed"
 h = pd.read_parquet(f"{OUT}/harmonized.parquet")
 fp = pd.read_parquet(f"{OUT}/fingerprints.parquet").set_index("cell_id")
 hs = pd.read_parquet(f"{OUT}/hotspots_clean.parquet")
-CROP = fp.index[fp.regime.str.startswith("Crop")]
+CROP = fp.index[fp.regime.str.startswith("Rice") & (fp.mean_annual >= 50)]
 
 # ---------- monthly panel with expanding (no-leak) median/MAD ----------
 P = (h[h.cell_id.isin(fp.index)][["cell_id", "month", "h_count"]]
