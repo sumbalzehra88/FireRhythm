@@ -2,4 +2,4 @@
 data/raw/
 __pycache__/
 *.pyc
-src/tempCodeRunnerFile.py
+src/tempCodeRunnerFile.py.streamlit/secrets.toml
