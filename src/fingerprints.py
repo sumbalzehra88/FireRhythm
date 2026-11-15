@@ -25,7 +25,8 @@ for c in keep:
     amp = 2 * np.sqrt(P) / w.sum()
     p = P[1:] / P[1:].sum()
     ent = float(-(p * np.log(p + 1e-12)).sum() / np.log(len(p)))   # spectral entropy 0-1
-    prof = X[c].groupby(X.index.month).mean(); prof = prof / prof.sum()
+    prof = X[c].groupby(X.index.month).mean().reindex(range(1, 13), fill_value=0)
+    prof = prof / prof.sum()
     rows.append(dict(cell_id=c, A12=amp[i12], A6=amp[i6], dom_period=1 / f[np.argmax(P)],
                      entropy=ent, peak_month=int(prof.idxmax()),
                      spring_share=prof[[4, 5, 6]].sum(), autumn_share=prof[[9, 10, 11, 12]].sum(),
@@ -40,7 +41,7 @@ hs = hs[((hs.sensor == "MODIS") & (hs.acq_date < sw)) | ((hs.sensor == "VIIRS") 
 mon = hs.acq_date.dt.month
 hs["season"] = np.select([mon.isin([4, 5, 6]), mon.isin([9, 10, 11, 12])], ["wheat", "rice"], "none")
 hs = hs[hs.season != "none"]
-hs["year"], hs["doy"] = hs.acq_date.dt.year, hs.acq_date.dt.dayofyear
+hs["year"], hs["doy"] = hs.acq_date.dt.year, hs.acq_date.dt.day_of_year
 
 def timing(g):
     d = np.sort(g.doy.values); n = len(d)
@@ -72,6 +73,11 @@ cm["rank"] = cm.groupby("regime").mean_annual.rank(ascending=False).astype(int)
 cm["regime"] = np.where(cm.groupby("regime").regime.transform("size") > 1,
                         cm.regime + np.where(cm["rank"] == 1, " - high", " - low"), cm.regime)
 fp["regime"] = fp.cluster.map(cm.regime)
+fp["regime"] = fp.regime.replace({
+    "Crop-residue (2-season) - high": "Rice–wheat residue (Oct–Nov + May)",
+    "Crop-residue (2-season) - low": "Mixed winter–spring burning",
+    "Single-season": "Spring single-season (wheat / foothill fires)",
+    "Irregular / other": "Irregular / low activity"})
 fp.reset_index().to_parquet(f"{OUT}/fingerprints.parquet")
 print("k =", best); print(cm.round(2)); print(fp.regime.value_counts())
 
